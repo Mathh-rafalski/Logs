@@ -17,6 +17,7 @@ connection.connect(function (err) {
     }
     console.log('Banco conectado')
 });
+
 var myLogger = function (req, res, next) {
     console.log('LOGGED')
     var url = req.url
@@ -33,27 +34,51 @@ var myLogger = function (req, res, next) {
     console.log(data)
     let sql = "INSERT INTO `logs` (`rota`,`ip`,`user_agent`,`data_hora`) VALUES ('" + url + "', '" + ip + "','" + user_agent + "','" + data + "')";
     connection.query(sql, function (err, result) {
-    
-    next()
+
     });
+    next()
 };
+app.get('/', function (req, res) {
+    let num = Math.floor(Math.random() * (6 - 1) + 1);
+    console.log(num)
+    if (num == 1) {
+
+        res.send("fala fi")
+    }
+    if (num == 2) {
+
+        res.send("É")
+    }
+    if (num == 3) {
+
+        res.send("pegadinha")
+    }
+    if (num == 4) {
+
+        res.send("garaio")
+    }
+    if (num == 5) {
+
+        res.send("kkk")
+    }
+});
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(myLogger)
 
 
-app.use('/ranking',function(req,res) {
+app.get('/ranking', function (req, res) {
     let sql = 'select rota,count(id) as Acessos from logs group by rota order by Acessos desc';
     let i = 1;
     let dados = ['Rotas | Acessos']
-    connection.query(sql, function(err, result,fields) {
-        if(err) {
+    connection.query(sql, function (err, result, fields) {
+        if (err) {
             res.json(err)
         } else {
             result.forEach(element => {
-                let string = element["rota"] + " | "+ element["Acessos"]
-                string = string.replace('[','')
-                string = string.replace('"','')
+                let string = element["rota"] + " | " + element["Acessos"]
+                string = string.replace('[', '')
+                string = string.replace('"', '')
                 /*if (i < string.length) {
                 i = string.length
                 }*/
@@ -69,34 +94,9 @@ app.use('/ranking',function(req,res) {
                 }
                 dados.push(element)
             });*/
-            res.header("Content-Type",'application/json');
+            res.header("Content-Type", 'application/json');
             res.send(JSON.stringify(dados, null, 4));
             // res.json(dados)
-    };
-});
-
-app.get('/', function (req, res) {
-        let num = Math.floor(Math.random() * (6 - 1) + 1);
-        console.log(num)
-        if (num == 1) {
-            
-            res.send("fala fi")
-        }
-        if (num == 2) {
-            
-            res.send("É")
-        }
-        if (num == 3) {
-            
-            res.send("pegadinha")
-        }
-        if (num == 4) {
-            
-            res.send("garaio")
-        }
-        if (num == 5) {
-            
-            res.send("kkk")
-        }
-    });
-});
+        };
+    })
+})
